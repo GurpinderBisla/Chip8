@@ -1,5 +1,6 @@
 #include "cpu.h"
 #include "string.h"
+#include <stdint.h>
 
 void
 cpu_initilize(struct cpu *cp)
@@ -10,5 +11,5 @@ cpu_initilize(struct cpu *cp)
 
     memset(cp->memory, 0, 4096);
     memset(cp->registers, 0, 16);
-    memset(cp->stack, 0, 16);
+    memset(cp->stack, 0, 16 * sizeof(uint16_t));
 }

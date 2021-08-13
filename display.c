@@ -3,6 +3,7 @@
  */
 
 #include <string.h>
+#include <sys/types.h>
 #include "display.h"
 
 void
@@ -26,7 +27,7 @@ initialize_graphics(struct display *display)
 
     display->window = window;
     display->renderer = renderer;
-    memset(display->screen, 0, sizeof(display->screen));
+    memset(display->screen, 0, SCREEN_SIZE * sizeof(u_int16_t));
 }
 
 void

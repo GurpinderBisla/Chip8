@@ -1,5 +1,7 @@
-#include "cpu.c"
-#include "display.c"
+#include <SDL2/SDL_timer.h>
+#include <stdio.h>
+#include "cpu.h"
+#include "display.h"
 
 const uint8_t FONT[] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -24,7 +26,7 @@ struct display  gfx;
 struct cpu      chip8;
 
 static void load_font();
-static void load_rom(char *filename);
+// static void load_rom(char *filename);
 
 int
 main(void)
@@ -32,6 +34,7 @@ main(void)
     initialize_graphics(&gfx);
     cpu_initilize(&chip8);
     load_font();
+
 
     destroy_display(&gfx);
     SDL_Quit();
