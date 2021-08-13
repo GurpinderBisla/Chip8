@@ -1,5 +1,6 @@
 #include <SDL2/SDL_timer.h>
 #include <stdio.h>
+#include <strings.h>
 #include "cpu.h"
 #include "display.h"
 
@@ -31,6 +32,14 @@ static void load_font();
 int
 main(void)
 {
+    /* if (argc != 2) {
+      printf("Usage: ./chip8 path-to-rom");
+      return 1;
+    } */
+
+    printf("%X\n", (0x30FE & 0x3));
+    printf("%X\n", (0xD0FE >> 12));
+
     initialize_graphics(&gfx);
     cpu_initilize(&chip8);
     load_font();
