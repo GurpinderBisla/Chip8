@@ -1,6 +1,8 @@
-#include <SDL2/SDL_timer.h>
 #include <stdio.h>
-#include <strings.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#include <SDL2/SDL_timer.h>
 #include "cpu.h"
 #include "display.h"
 
@@ -27,22 +29,28 @@ struct display  gfx;
 struct cpu      chip8;
 
 static void load_font();
-// static void load_rom(char *filename);
+static bool load_rom(char *filename);
 
 int
-main(void)
+main(int argc, char *argv[])
 {
-    /* if (argc != 2) {
+    if (argc != 2) {
       printf("Usage: ./chip8 path-to-rom");
       return 1;
-    } */
-
-    printf("%X\n", (0x30FE & 0x3));
-    printf("%X\n", (0xD0FE >> 12));
+    }
 
     initialize_graphics(&gfx);
     cpu_initilize(&chip8);
     load_font();
+
+    if (!load_rom(argv[1])) {
+        printf("Failed to load rom\n");
+        return 1;
+    }
+
+    for (int i = 0; i < 10; i += 2) {
+        printf("%X\n", (chip8.memory[0x200 + i] << 8) | chip8.memory[0x200 + i + 1]);
+    }
 
 
     destroy_display(&gfx);
@@ -57,4 +65,24 @@ load_font()
     /* Load font into memory blocks 0x50 to 0x9F */
     for (int i = 0; i < length; i++)
         chip8.memory[0x50 + i] = FONT[i];
+}
+
+/* Load roam into memory, starting at memory block 0x200 */
+static bool
+load_rom(char *filename)
+{
+    FILE *rom;
+    int len;
+
+    rom = fopen(filename, "r");
+    if (rom == NULL)
+        return false;
+
+    fseek(rom, 0, SEEK_END);
+    len = ftell(rom);
+    fseek(rom, 0, SEEK_SET);
+    fread(&chip8.memory[0x200], sizeof(uint8_t), len, rom);
+
+    fclose(rom);
+    return true;
 }
