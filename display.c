@@ -27,7 +27,7 @@ initialize_graphics(struct display *display)
 
     display->window = window;
     display->renderer = renderer;
-    memset(display->screen, 0, SCREEN_SIZE * sizeof(u_int16_t));
+    memset(display->screen, 0, SCREEN_SIZE * sizeof(int));
 }
 
 void
@@ -35,4 +35,14 @@ destroy_display(struct display *display)
 {
     SDL_DestroyWindow(display->window);
     SDL_DestroyRenderer(display->renderer);
+}
+
+void
+clear_screen(struct display *display)
+{
+    memset(display->screen, 0, SCREEN_SIZE * sizeof(int));
+
+    SDL_SetRenderDrawColor(display->renderer, 255, 255, 255, 255);
+    SDL_RenderClear(display->renderer);
+    SDL_RenderPresent(display->renderer);
 }

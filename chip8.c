@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 #include <SDL2/SDL_timer.h>
@@ -48,10 +47,9 @@ main(int argc, char *argv[])
         return 1;
     }
 
-    for (int i = 0; i < 10; i += 2) {
-        printf("%X\n", (chip8.memory[0x200 + i] << 8) | chip8.memory[0x200 + i + 1]);
+    for (int i = 0; i < 2; i++) {
+        execute_cpu_cycle(&chip8, &gfx);
     }
-
 
     destroy_display(&gfx);
     SDL_Quit();
@@ -72,7 +70,7 @@ static bool
 load_rom(char *filename)
 {
     FILE *rom;
-    int len;
+    long len;
 
     rom = fopen(filename, "r");
     if (rom == NULL)

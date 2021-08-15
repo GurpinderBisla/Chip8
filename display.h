@@ -25,7 +25,7 @@ void initialize_graphics(struct display *display);
 /* Free all memory related to the display */
 void destroy_display(struct display *display);
 /* sets all elements in screen array to 0 */
-//void clear_screen(struct display *display);
+void clear_screen(struct display *display);
 
 
 #endif //CHIP8_DISPLAY_H
