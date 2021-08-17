@@ -51,6 +51,7 @@ main(int argc, char *argv[])
         execute_cpu_cycle(&chip8, &gfx);
     }
 
+    SDL_Delay(3000);
     destroy_display(&gfx);
     SDL_Quit();
 }

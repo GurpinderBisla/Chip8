@@ -26,6 +26,8 @@ void initialize_graphics(struct display *display);
 void destroy_display(struct display *display);
 /* sets all elements in screen array to 0 */
 void clear_screen(struct display *display);
+/* Draws a sprite of N height at a given x and y coordinate*/
+void draw(struct display *gfx, int Vx, int Vy, int N);
 
 
 #endif //CHIP8_DISPLAY_H
