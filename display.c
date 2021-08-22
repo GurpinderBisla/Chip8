@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include "display.h"
 
-static void clear_screen_array(struct display *gfx, int X, int Y);
+static void clear_screen_array(struct display *gfx, int X, int Y, int N);
 
 void
 initialize_graphics(struct display *display)
@@ -30,14 +30,17 @@ initialize_graphics(struct display *display)
 
     display->window = window;
     display->renderer = renderer;
-    memset(display->screen, 0, SCREEN_SIZE * sizeof(int));
+
+    for (int i = 0; i < HEIGHT * SCREEN_SCALE; i++)
+      memset(display->screen, 0, (WIDTH * SCREEN_SCALE) * sizeof(int));
 }
 
 
 void
 clear_screen(struct display *display)
 {
-    memset(display->screen, 0, SCREEN_SIZE * sizeof(int));
+    for (int i = 0; i < HEIGHT * SCREEN_SCALE; i++)
+      memset(display->screen, 0, (WIDTH * SCREEN_SCALE) * sizeof(int));
 
     SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
     SDL_RenderClear(display->renderer);
@@ -47,13 +50,20 @@ clear_screen(struct display *display)
 void
 draw(struct display *gfx, int Vx, int Vy, int N)
 {
-    clear_screen_array(gfx, Vx, Vy);
+    Vx = Vx % (WIDTH * SCREEN_SCALE);
+    Vy = Vy % (HEIGHT * SCREEN_SCALE);
+
+    clear_screen_array(gfx, Vx, Vy, N);
 }
 
 static void
-clear_screen_array(struct display *gfx, int X, int Y)
+clear_screen_array(struct display *gfx, int X, int Y, int N)
 {
+    int i;
 
+    for (i = 0; i < N; i++) {
+        gfx->screen[i][X] = 5;
+    }
 }
 
 

@@ -58,6 +58,7 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
             cp->IR = GET_NNN(opcode);
             break;
         case 0x000D: /* Draw to screen */
+            draw(gfx, GET_VX(opcode), GET_VY(opcode), GET_N(opcode));
             break;
         default:
             printf("opcode:%X not yet implemented", opcode);

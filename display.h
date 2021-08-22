@@ -16,7 +16,7 @@
 struct display {
     SDL_Window      *window;
     SDL_Renderer    *renderer;
-    int             screen[SCREEN_SIZE];
+    int             screen[HEIGHT * SCREEN_SCALE][WIDTH * SCREEN_SCALE];
 };
 
 /* Variable declarations */
