@@ -62,7 +62,7 @@ clear_screen_array(struct display *gfx, int X, int Y, int N)
     int i;
 
     for (i = 0; i < N; i++) {
-        gfx->screen[i][X] = 5;
+        gfx->screen[Y][X] = 5;
     }
 }
 
