@@ -6,19 +6,19 @@
 #define CHIP8_DISPLAY_H
 #include "SDL2/SDL.h"
 #include <sys/types.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 /* All constants related to rendering the screen */
 #define WIDTH 64
 #define HEIGHT 32
 #define SCREEN_SCALE 10
-#define SCREEN_SIZE (WIDTH * SCREEN_SCALE) * (HEIGHT * SCREEN_SCALE)
 
 /* Struct that represents the display itself */
 struct display {
     SDL_Window      *window;
     SDL_Renderer    *renderer;
-    int             screen[HEIGHT * SCREEN_SCALE][WIDTH * SCREEN_SCALE];
+    int             screen[HEIGHT][WIDTH];
 };
 
 /* Variable declarations */
@@ -26,10 +26,12 @@ struct display {
 void initialize_graphics(struct display *display);
 /* Free all memory related to the display */
 void destroy_display(struct display *display);
-/* sets all elements in screen array to 0 */
+/* Sets all elements in screen array to 0 */
 void clear_screen(struct display *display);
+/* Detects if a collision was made in game */
+bool detect_collisions(struct display *gfx, int X, int Y, int N);
 /* Draws a sprite of N height at a given x and y coordinate*/
-void draw(struct display *gfx, int Vx, int Vy, int N, uint8_t *draw_flag);
+void draw(struct display *gfx, int Vx, int Vy, int N);
 
 
 #endif //CHIP8_DISPLAY_H

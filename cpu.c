@@ -40,6 +40,7 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
 {
     uint16_t opcode;
     opcode = fetch(cp);
+    //printf("%X\n", opcode);
 
     switch (opcode >> 12) {
         case 0x0000: /* Clear screen */
@@ -52,18 +53,23 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
             cp->registers[GET_VX(opcode)] = GET_NN(opcode);
             break;
         case 0x0007: /* Add value to VX */
+            printf("new Vx:%d->%d\n", cp->registers[GET_VX(opcode)], GET_NN(opcode));
             cp->registers[GET_VX(opcode)] += GET_NN(opcode);
+            printf("new Vx:%d->%d\n", cp->registers[GET_VX(opcode)], GET_NN(opcode));
             break;
         case 0x000A: /* Set IR */
             cp->IR = GET_NNN(opcode);
             break;
         case 0x000D: /* Draw to screen */
-            draw(gfx,GET_VX(opcode), GET_VY(opcode), GET_N(opcode), &cp->registers[0xF]);
-            if (cp->registers[0xF] == 1)
-                break;
+            cp->registers[0xF] = 0;
+            if (detect_collisions(gfx, GET_VX(opcode), GET_VY(opcode), GET_N(opcode))) {
+               cp->registers[0xF] = 1;
+               draw(gfx, cp->registers[GET_VX(opcode)], cp->registers[GET_VY(opcode)], GET_N(opcode));
+            }
+
             break;
         default:
-            printf("opcode:%X not yet implemented", opcode);
+            printf("opcode:%X not yet implemented\n", opcode);
             break;
     }
 }

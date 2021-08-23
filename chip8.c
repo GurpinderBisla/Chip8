@@ -47,20 +47,33 @@ main(int argc, char *argv[])
         return 1;
     }
 
-    for (int i = 0; i < 2; i++) {
+    SDL_Event e;
+    bool quit = false;
+    while (!quit){
+        SDL_Delay(1000);
         execute_cpu_cycle(&chip8, &gfx);
+        while (SDL_PollEvent(&e)){
+            if (e.type == SDL_QUIT){
+                destroy_display(&gfx);
+                SDL_Quit();
+                quit = true;
+            }
+            if (e.type == SDL_KEYDOWN){
+                continue;
+            }
+            if (e.type == SDL_MOUSEBUTTONDOWN){
+                continue;
+            }
+        }
     }
-
-    SDL_Delay(3000);
-    destroy_display(&gfx);
-    SDL_Quit();
 }
 
+/* Load font into memory blocks 0x50 to 0x9F */
 static void
 load_font()
 {
     int length =  sizeof(FONT) / sizeof(FONT[0]);
-/* Load font into memory blocks 0x50 to 0x9F */ for (int i = 0; i < length; i++)
+    for (int i = 0; i < length; i++)
         chip8.memory[0x50 + i] = FONT[i];
 }
 
