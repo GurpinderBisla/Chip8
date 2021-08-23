@@ -3,11 +3,14 @@
  */
 
 #include <SDL2/SDL_render.h>
-#include <string.h>
+#include <SDL2/SDL_stdinc.h>
 #include <sys/types.h>
+#include <string.h>
+#include <stdbool.h>
+
 #include "display.h"
 
-static void clear_screen_array(struct display *gfx, int X, int Y, int N);
+static bool clear_screen_array(struct display *gfx, int X, int Y, int N);
 
 void
 initialize_graphics(struct display *display)
@@ -48,22 +51,35 @@ clear_screen(struct display *display)
 }
 
 void
-draw(struct display *gfx, int Vx, int Vy, int N)
+draw(struct display *gfx, int Vx, int Vy, int N, uint8_t *draw_flag)
 {
     Vx = Vx % (WIDTH * SCREEN_SCALE);
     Vy = Vy % (HEIGHT * SCREEN_SCALE);
+    draw_flag = 0;
 
-    clear_screen_array(gfx, Vx, Vy, N);
+    if (clear_screen_array(gfx, Vx, Vy, N))
+        draw_flag = (uint8_t *) 1;
 }
 
-static void
+/* Returns true if a bit was flipped from on to off */
+static bool
 clear_screen_array(struct display *gfx, int X, int Y, int N)
 {
-    int i;
+    int i, j;
+    bool bit_was_flipped = false;
 
     for (i = 0; i < N; i++) {
-        gfx->screen[Y][X] = 5;
+      for (j = 0; j < 8 * SCREEN_SCALE; j++) {
+          if (gfx->screen[Y + i][X + j] == 0) {
+              gfx->screen[Y + 1][X + j] = 1;
+          } else {
+              gfx->screen[Y + i][X + j] = 0;
+              bit_was_flipped = true;
+          }
+      }
     }
+
+    return bit_was_flipped;
 }
 
 

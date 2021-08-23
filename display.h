@@ -5,6 +5,8 @@
 #ifndef CHIP8_DISPLAY_H
 #define CHIP8_DISPLAY_H
 #include "SDL2/SDL.h"
+#include <sys/types.h>
+#include <stdint.h>
 
 /* All constants related to rendering the screen */
 #define WIDTH 64
@@ -27,7 +29,7 @@ void destroy_display(struct display *display);
 /* sets all elements in screen array to 0 */
 void clear_screen(struct display *display);
 /* Draws a sprite of N height at a given x and y coordinate*/
-void draw(struct display *gfx, int Vx, int Vy, int N);
+void draw(struct display *gfx, int Vx, int Vy, int N, uint8_t *draw_flag);
 
 
 #endif //CHIP8_DISPLAY_H

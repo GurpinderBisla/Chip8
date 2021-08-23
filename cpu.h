@@ -3,11 +3,11 @@
  * Created by Gurpinder Bisla on 2021-08-08.
  */
 
-#include <stdint.h>
-#include "display.h"
-
 #ifndef CPU_H
 #define CPU_H
+
+#include <stdint.h>
+#include "display.h"
 
 struct cpu {
     uint16_t pc;            /* Address of the current instruction */

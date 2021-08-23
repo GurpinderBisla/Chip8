@@ -60,9 +60,7 @@ static void
 load_font()
 {
     int length =  sizeof(FONT) / sizeof(FONT[0]);
-
-    /* Load font into memory blocks 0x50 to 0x9F */
-    for (int i = 0; i < length; i++)
+/* Load font into memory blocks 0x50 to 0x9F */ for (int i = 0; i < length; i++)
         chip8.memory[0x50 + i] = FONT[i];
 }
 
