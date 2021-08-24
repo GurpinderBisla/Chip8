@@ -2,6 +2,7 @@
  * Handles all operations related to graphics and creating a window
  */
 
+#include <SDL2/SDL_render.h>
 #include <string.h>
 #include "display.h"
 
@@ -46,20 +47,29 @@ clear_screen(struct display *display)
 void
 draw(struct display *gfx, int Vx, int Vy, int N)
 {
-    //printf("%d:%d/n", Vx, Vy);
-    Vx = Vx % (WIDTH * SCREEN_SCALE);
-    Vy = Vy % (HEIGHT * SCREEN_SCALE);
+    int row, col;
 
-    SDL_Rect sprite;
-    sprite.x = Vx;
-    sprite.y = Vy;
-    sprite.w = 8;
-    sprite.h = N;
+    for (row = 0; row < HEIGHT; row++) {
+      for (col = 0; col < WIDTH; col++) {
+        if (gfx->screen[row][col] == 1) {
+          Vx = col % WIDTH;
+          Vy = row % HEIGHT;
 
-    printf("rect: %d, %d, %d, %d\n", sprite.x,sprite.y,sprite.w,sprite.h);
-    SDL_SetRenderDrawColor(gfx->renderer, 255, 255, 255, 255);
-    SDL_RenderDrawRect(gfx->renderer, &sprite);
-    SDL_RenderPresent(gfx->renderer);
+          SDL_Rect sprite;
+          sprite.x = Vx * SCREEN_SCALE;
+          sprite.y = Vy * SCREEN_SCALE;
+          sprite.w = 8;
+          sprite.h = N - 10;
+
+          printf("rect: %d, %d, %d, %d\n", sprite.x, sprite.y, sprite.w,
+                 sprite.h);
+          SDL_SetRenderDrawColor(gfx->renderer, 255, 255, 255, 255);
+          SDL_RenderFillRect(gfx->renderer, &sprite);
+          SDL_RenderDrawRect(gfx->renderer, &sprite);
+          SDL_RenderPresent(gfx->renderer);
+        }
+      }
+    }
 }
 
 /* Returns true if a bit was flipped from on to off */
@@ -74,7 +84,7 @@ detect_collisions(struct display *gfx, int X, int Y, int N)
     for (i = 0; i < N; i++) {
       for (j = 0; j < 8; j++) {
           if (gfx->screen[Y + i][X + j] == 0) {
-              gfx->screen[Y + 1][X + j] = 1;
+              gfx->screen[Y + i][X + j] = 1;
           } else {
               gfx->screen[Y + i][X + j] = 0;
               collision_detected = true;

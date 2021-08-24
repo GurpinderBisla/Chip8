@@ -59,7 +59,9 @@ main(int argc, char *argv[])
                 quit = true;
             }
             if (e.type == SDL_KEYDOWN){
-                continue;
+                destroy_display(&gfx);
+                SDL_Quit();
+                quit = true;
             }
             if (e.type == SDL_MOUSEBUTTONDOWN){
                 continue;

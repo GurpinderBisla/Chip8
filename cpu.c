@@ -40,7 +40,7 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
 {
     uint16_t opcode;
     opcode = fetch(cp);
-    //printf("%X\n", opcode);
+    printf("%X\n", opcode);
 
     switch (opcode >> 12) {
         case 0x0000: /* Clear screen */
@@ -62,10 +62,11 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
             break;
         case 0x000D: /* Draw to screen */
             cp->registers[0xF] = 0;
-            if (detect_collisions(gfx, GET_VX(opcode), GET_VY(opcode), GET_N(opcode))) {
+            if (detect_collisions(gfx, cp->registers[GET_VX(opcode)], cp->registers[GET_VY(opcode)], GET_N(opcode))) {
                cp->registers[0xF] = 1;
                draw(gfx, cp->registers[GET_VX(opcode)], cp->registers[GET_VY(opcode)], GET_N(opcode));
             }
+               draw(gfx, cp->registers[GET_VX(opcode)], cp->registers[GET_VY(opcode)], GET_N(opcode));
 
             break;
         default:
