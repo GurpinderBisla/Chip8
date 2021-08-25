@@ -58,8 +58,8 @@ draw(struct display *gfx, int Vx, int Vy, int N)
           SDL_Rect sprite;
           sprite.x = Vx * SCREEN_SCALE;
           sprite.y = Vy * SCREEN_SCALE;
-          sprite.w = 8;
-          sprite.h = N - 10;
+          sprite.w = 4;
+          sprite.h = N;
 
           printf("rect: %d, %d, %d, %d\n", sprite.x, sprite.y, sprite.w,
                  sprite.h);
@@ -83,13 +83,11 @@ detect_collisions(struct display *gfx, int X, int Y, int N)
 
     for (i = 0; i < N; i++) {
       for (j = 0; j < 8; j++) {
-          if (gfx->screen[Y + i][X + j] == 0) {
-              gfx->screen[Y + i][X + j] = 1;
-          } else {
-              gfx->screen[Y + i][X + j] = 0;
+          if (gfx->screen[Y + i][X + j] == 1)
               collision_detected = true;
-          }
-      }
+
+          gfx->screen[Y + i][X + j] ^= 0x1;
+        }
     }
 
     return collision_detected;
@@ -101,4 +99,5 @@ destroy_display(struct display *display)
 {
     SDL_DestroyWindow(display->window);
     SDL_DestroyRenderer(display->renderer);
+    SDL_Quit();
 }
