@@ -29,7 +29,7 @@ void destroy_display(struct display *display);
 /* Sets all elements in screen array to 0 */
 void clear_screen(struct display *display);
 /* Detects if a collision was made in game */
-bool detect_collisions(struct display *gfx, int X, int Y, int N);
+bool detect_collisions(struct display *gfx, int X, int Y, int N, uint8_t memory[4096], int IR);
 /* Draws a sprite of N height at a given x and y coordinate*/
 void draw(struct display *gfx, int Vx, int Vy, int N);
 

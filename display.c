@@ -3,6 +3,7 @@
  */
 
 #include <SDL2/SDL_render.h>
+#include <stdio.h>
 #include <string.h>
 #include "display.h"
 
@@ -48,6 +49,7 @@ void
 draw(struct display *gfx, int Vx, int Vy, int N)
 {
     int row, col;
+    SDL_Rect sprite;
 
     for (row = 0; row < HEIGHT; row++) {
       for (col = 0; col < WIDTH; col++) {
@@ -55,14 +57,11 @@ draw(struct display *gfx, int Vx, int Vy, int N)
           Vx = col % WIDTH;
           Vy = row % HEIGHT;
 
-          SDL_Rect sprite;
           sprite.x = Vx * SCREEN_SCALE;
           sprite.y = Vy * SCREEN_SCALE;
-          sprite.w = 4;
-          sprite.h = N;
+          sprite.w = 10;
+          sprite.h = N - 3;
 
-          printf("rect: %d, %d, %d, %d\n", sprite.x, sprite.y, sprite.w,
-                 sprite.h);
           SDL_SetRenderDrawColor(gfx->renderer, 255, 255, 255, 255);
           SDL_RenderFillRect(gfx->renderer, &sprite);
           SDL_RenderDrawRect(gfx->renderer, &sprite);
@@ -74,19 +73,22 @@ draw(struct display *gfx, int Vx, int Vy, int N)
 
 /* Returns true if a bit was flipped from on to off */
 bool
-detect_collisions(struct display *gfx, int X, int Y, int N)
+detect_collisions(struct display *gfx, int X, int Y, int N, uint8_t memory[4096], int IR)
 {
-    int i, j;
+    int i, j; 
+    uint8_t sprite;
     bool collision_detected = false;
     X = X % WIDTH;
     Y = Y % HEIGHT;
 
     for (i = 0; i < N; i++) {
+      sprite = memory[IR + i];
+
       for (j = 0; j < 8; j++) {
           if (gfx->screen[Y + i][X + j] == 1)
               collision_detected = true;
 
-          gfx->screen[Y + i][X + j] ^= 0x1;
+          gfx->screen[Y + i][X + j] ^= (sprite >> (7 - j)) & 0x1;
         }
     }
 
