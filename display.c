@@ -50,15 +50,15 @@ draw(struct display *gfx, int Vx, int Vy, int N)
 {
     int row, col;
     SDL_Rect sprite;
+    Vx %= WIDTH;
+    Vy %= HEIGHT;
 
-    for (row = 0; row < HEIGHT; row++) {
-      for (col = 0; col < WIDTH; col++) {
-        if (gfx->screen[row][col] == 1) {
-          Vx = col % WIDTH;
-          Vy = row % HEIGHT;
+    for (row = 0; row < N; row++) {
+      for (col = 0; col < 8; col++) {
+        if (gfx->screen[Vy + row][Vx + col] == 1) {
 
-          sprite.x = Vx * SCREEN_SCALE;
-          sprite.y = Vy * SCREEN_SCALE;
+          sprite.x = (Vx + col) * SCREEN_SCALE;
+          sprite.y = (Vy + row) * SCREEN_SCALE;
           sprite.w = 10;
           sprite.h = N - 3;
 
