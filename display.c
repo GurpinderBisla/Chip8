@@ -30,7 +30,7 @@ initialize_graphics(struct display *display)
     display->renderer = renderer;
 
     for (int i = 0; i < HEIGHT * SCREEN_SCALE; i++)
-      memset(display->screen, 0, (WIDTH * SCREEN_SCALE) * sizeof(int));
+        memset(display->screen, 0, (WIDTH * SCREEN_SCALE) * sizeof(int));
 }
 
 
@@ -38,7 +38,7 @@ void
 clear_screen(struct display *display)
 {
     for (int i = 0; i < HEIGHT * SCREEN_SCALE; i++)
-      memset(display->screen, 0, (WIDTH * SCREEN_SCALE) * sizeof(int));
+        memset(display->screen, 0, (WIDTH * SCREEN_SCALE) * sizeof(int));
 
     SDL_SetRenderDrawColor(display->renderer, 0, 0, 0, 255);
     SDL_RenderClear(display->renderer);
@@ -46,49 +46,51 @@ clear_screen(struct display *display)
 }
 
 void
-draw(struct display *gfx, int Vx, int Vy, int N)
+draw(struct display *gfx)
 {
     int row, col;
     SDL_Rect sprite;
-    Vx %= WIDTH;
-    Vy %= HEIGHT;
 
-    for (row = 0; row < N; row++) {
-      for (col = 0; col < 8; col++) {
-        if (gfx->screen[Vy + row][Vx + col] == 1) {
+    /* Clear screen before drawing to get rid unused sprites */
+    SDL_SetRenderDrawColor(gfx->renderer, 0, 0, 0, 255);
+    SDL_RenderClear(gfx->renderer);
 
-          sprite.x = (Vx + col) * SCREEN_SCALE;
-          sprite.y = (Vy + row) * SCREEN_SCALE;
-          sprite.w = 10;
-          sprite.h = N - 3;
+    for (row = 0; row < HEIGHT; row++) {
+        for (col = 0; col < WIDTH; col++) {
+            if (gfx->screen[row][col] == 1) {
+                sprite.x = (col % WIDTH) * SCREEN_SCALE;
+                sprite.y = (row % HEIGHT) * SCREEN_SCALE;
+                sprite.w = 10;
+                sprite.h = 15;
 
-          SDL_SetRenderDrawColor(gfx->renderer, 255, 255, 255, 255);
-          SDL_RenderFillRect(gfx->renderer, &sprite);
-          SDL_RenderDrawRect(gfx->renderer, &sprite);
-          SDL_RenderPresent(gfx->renderer);
+                SDL_SetRenderDrawColor(gfx->renderer, 255, 110, 100, 255);
+                SDL_RenderFillRect(gfx->renderer, &sprite);
+                SDL_RenderDrawRect(gfx->renderer, &sprite);
+            }
         }
-      }
     }
+
+    SDL_RenderPresent(gfx->renderer);
 }
 
 /* Returns true if a bit was flipped from on to off */
 bool
-detect_collisions(struct display *gfx, int X, int Y, int N, uint8_t memory[4096], int IR)
+detect_collisions(struct display *gfx, int X, int Y, int N, const uint8_t memory[4096], int IR)
 {
-    int i, j; 
+    int i, j;
     uint8_t sprite;
     bool collision_detected = false;
-    X = X % WIDTH;
-    Y = Y % HEIGHT;
+    X %= WIDTH;
+    Y %= HEIGHT;
 
     for (i = 0; i < N; i++) {
-      sprite = memory[IR + i];
+        sprite = memory[IR + i];
 
-      for (j = 0; j < 8; j++) {
-          if (gfx->screen[Y + i][X + j] == 1)
-              collision_detected = true;
+        for (j = 0; j < 8; j++) {
+            if (gfx->screen[Y + i][X + j] == 1)
+                collision_detected = true;
 
-          gfx->screen[Y + i][X + j] ^= (sprite >> (7 - j)) & 0x1;
+            gfx->screen[Y + i][X + j] ^= (sprite >> (7 - j)) & 0x1;
         }
     }
 
