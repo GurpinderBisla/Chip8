@@ -50,7 +50,7 @@ main(int argc, char *argv[])
     SDL_Event e;
     bool quit = false;
     while (!quit){
-        SDL_Delay(250);
+        // SDL_Delay(250);
         execute_cpu_cycle(&chip8, &gfx);
         while (SDL_PollEvent(&e)){
             if (e.type == SDL_QUIT){

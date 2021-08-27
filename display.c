@@ -61,7 +61,7 @@ draw(struct display *gfx)
                 sprite.x = (col % WIDTH) * SCREEN_SCALE;
                 sprite.y = (row % HEIGHT) * SCREEN_SCALE;
                 sprite.w = 10;
-                sprite.h = 15;
+                sprite.h = 10;
 
                 SDL_SetRenderDrawColor(gfx->renderer, 255, 110, 100, 255);
                 SDL_RenderFillRect(gfx->renderer, &sprite);
