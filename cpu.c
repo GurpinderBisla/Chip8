@@ -46,28 +46,28 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
 {
     uint16_t opcode;
     uint8_t rand_num;
+    bool pressed;
+    int diff;
     opcode = fetch(cp);
     //printf("opcode: %X\n", opcode);
 
     /* Run 60 opcodes a second */
-    SDL_Delay(1000/240);
+    SDL_Delay(1000/250);
     switch (opcode >> 12) {
         case 0x0: /* Clear screen or return */
             if (GET_N(opcode) == 0x0) {
                 clear_screen(gfx);
                 cp->registers[0xF] = 1;
             }
-            else {
+            else
                 cp->pc = cp->stack[--cp->sp];
-            }
             break;
         case 0x1: /* Jump */
             cp->pc = GET_NNN(opcode);
             break;
-        case 0x2: /* TODO Call subroutine */
+        case 0x2: /* Call subroutine */
             cp->stack[cp->sp++] = cp->pc;
             cp->pc = GET_NNN(opcode);
-            printf("test\n");
             break;
         case 0x3: /* Skip if Vx equals NN */
             if (cp->registers[GET_VX(opcode)] == GET_NN(opcode))
@@ -102,26 +102,42 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
                     cp->registers[GET_VX(opcode)] ^= cp->registers[GET_VY(opcode)];
                     break;
                 case 0x4: /* Add Vy to Vx and set flag if overflow occurs */
-                    if (cp->registers[GET_VX(opcode)] + cp->registers[GET_VY(opcode)] < cp->registers[GET_VX(opcode)])
+                    cp->registers[0xF] = 0;
+                    diff = cp->registers[GET_VX(opcode)] + cp->registers[GET_VY(opcode)];
+                    if (diff > 255) {
                         cp->registers[0xF] = 1;
-                    else
-                        cp->registers[0xF] = 0;
+                        diff -= 256;
+                    }
 
-                    cp->registers[GET_VX(opcode)] += cp->registers[GET_VY(opcode)];
+                    cp->registers[GET_VX(opcode)] = diff;
                     break;
                 case 0x5: /* Subtract Vy from Vx */
-                    cp->registers[GET_VX(opcode)] -= cp->registers[GET_VY(opcode)];
+                    cp->registers[0xF] = 1;
+                    diff = cp->registers[GET_VX(opcode)] - cp->registers[GET_VY(opcode)];
+                    if (diff < 0) {
+                        cp->registers[0xF] = 0;
+                        diff += 256;
+                    }
+
+                    cp->registers[GET_VX(opcode)] = diff;
                     break;
                 case 0x6: /* Set Vx to Vy then shift right 1 */
-                    cp->registers[GET_VX(opcode)] = cp->registers[GET_VY(opcode)];
+                    cp->registers[0xF] = cp->registers[GET_VX(opcode)] & 0x1;
                     cp->registers[GET_VX(opcode)] >>= 1;
                     break;
                 case 0x7:
-                    cp->registers[GET_VX(opcode)] =
-                            cp->registers[GET_VY(opcode)] - cp->registers[GET_VX(opcode)];
+                    if (cp->registers[GET_VY(opcode)] > cp->registers[GET_VX(opcode)]) {
+                        cp->registers[GET_VX(opcode)] =
+                                cp->registers[GET_VY(opcode)] - cp->registers[GET_VX(opcode)];
+                        cp->registers[0xF] = 1;
+                    } else {
+                        cp->registers[GET_VX(opcode)] =
+                                cp->registers[GET_VY(opcode)] - cp->registers[GET_VX(opcode)] + 256;
+                        cp->registers[0xF] = 0;
+                    }
                     break;
-                case 0xE:
-                    cp->registers[GET_VX(opcode)] = cp->registers[GET_VY(opcode)];
+                case 0xE: /* Set VF to MSB of VX then shift VX left by 1 */
+                    cp->registers[0xF] = cp->registers[GET_VX(opcode)] >> 7;
                     cp->registers[GET_VX(opcode)] <<= 1;
                     break;
                 default:
@@ -141,7 +157,7 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
             break;
         case 0xC: /* Generate random number */
             srand(time(NULL));
-            rand_num = rand();
+            rand_num = rand() % 0xFF;
             cp->registers[GET_VX(opcode)] = (rand_num & GET_NN(opcode));
             break;
         case 0xD: /* Draw to screen */
@@ -157,24 +173,32 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
             break;
         case 0xE: /* Skip if key */
             switch (GET_N(opcode)) {
-                case 0x1: /* Skip if Vx is pressed */
-                    if (cp->keyboard[cp->registers[GET_VY(opcode)]])
+                case 0x1: /* Skip if Vx is not pressed */
+                    if (cp->keyboard[cp->registers[GET_VX(opcode)]] != 1)
                         cp->pc += 2;
                     break;
-                case 0xE: /* Skip if Vx is not pressed */
-                    printf("-------------\n");
-                    if (!cp->keyboard[cp->registers[GET_VY(opcode)]])
+                case 0xE: /* Skip if Vx is pressed */
+                    if (cp->keyboard[cp->registers[GET_VX(opcode)]] == 1)
                         cp->pc += 2;
                     break;
             }
             break;
-        case 0xF: /* System: TODO FX0A */
+        case 0xF: /* System: */
             switch (GET_NN(opcode)) {
                 case 0x07: /* Set Vx to value of delay timer */
                     cp->registers[GET_VX(opcode)] = cp->delay_timer;
                     break;
                 case 0x0A: /* TODO wait until input*/
-                    printf("TODO FX0A\n");
+                    pressed = false;
+                    for (int i = 0; i < 0xF; i++) {
+                        if (cp->keyboard[i] == 1) {
+                            cp->registers[GET_VX(opcode)] = i;
+                            pressed = true;
+                        }
+                    }
+
+                    if (!pressed)
+                        cp->pc -= 2;
                     break;
                 case 0x15: /* Set delay timer to Vx */
                     cp->delay_timer = cp->registers[GET_VX(opcode)];
@@ -186,8 +210,7 @@ execute_cpu_cycle(struct cpu *cp, struct display *gfx)
                     cp->IR += cp->registers[GET_VX(opcode)];
                     break;
                 case 0x29: /* IR is set to address of the character in vx */
-                    //cp->IR = cp->memory[0x200 + (GET_VX(opcode) * 5)];
-                    cp->IR = 0x50 + GET_VX(opcode) * 5;
+                    cp->IR = 0x50 + (cp->registers[GET_VX(opcode)] * 5);
                     break;
                 case 0x33: /* split a number into memory*/
                     cp->memory[cp->IR] =  cp->registers[GET_VX(opcode)] / 100;

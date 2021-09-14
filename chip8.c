@@ -23,11 +23,19 @@ const uint8_t FONT[] = {
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
+const SDL_KeyCode keyboard_keys[] = {
+        SDLK_1, SDLK_2, SDLK_3, SDLK_4,
+        SDLK_q, SDLK_w, SDLK_e, SDLK_r,
+        SDLK_a, SDLK_s, SDLK_d, SDLK_f,
+        SDLK_z, SDLK_x, SDLK_c, SDLK_v,
+};
+
 struct display  gfx;
 struct cpu      chip8;
 
 static void load_font();
 static bool load_rom(char *filename);
+static void set_key_on(SDL_KeyCode target);
 
 int
 main(int argc, char *argv[])
@@ -55,12 +63,16 @@ main(int argc, char *argv[])
                 destroy_display(&gfx);
                 quit = true;
             }
-            if (e.type == SDL_KEYDOWN){
+            if (e.key.keysym.sym == SDLK_ESCAPE) {
                 destroy_display(&gfx);
                 quit = true;
             }
-            if (e.type == SDL_MOUSEBUTTONDOWN){
-                continue;
+            if (e.type == SDL_KEYDOWN) {
+                set_key_on(e.key.keysym.sym);
+            }
+            if (e.type == SDL_KEYUP) {
+                for (int i = 0; i < 0xF; i++)
+                    chip8.keyboard[i] = 0;
             }
         }
     }
@@ -93,4 +105,14 @@ load_rom(char *filename)
 
     fclose(rom);
     return true;
+}
+
+static void
+set_key_on(SDL_KeyCode target)
+{
+    int i;
+    for (i = 0; i < 0xf; i++) {
+        if (target == keyboard_keys[i])
+            chip8.keyboard[i] = 1;
+    }
 }
