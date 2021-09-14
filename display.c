@@ -86,10 +86,12 @@ detect_collisions(struct display *gfx, int X, int Y, int N, const uint8_t memory
         sprite = memory[IR + i];
 
         for (j = 0; j < 8; j++) {
-            if (gfx->screen[Y + i][X + j] == 1)
-                collision_detected = true;
+            if (sprite & (0x80 >> j)) {
+                if (gfx->screen[Y + i][X + j] == 1)
+                    collision_detected = true;
 
-            gfx->screen[Y + i][X + j] ^= (sprite >> (7 - j)) & 0x1;
+                gfx->screen[Y + i][X + j] ^= 1;
+            }
         }
     }
 
