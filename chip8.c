@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include <SDL2/SDL_timer.h>
 #include "cpu.h"
 #include "display.h"
 
@@ -50,7 +49,6 @@ main(int argc, char *argv[])
     SDL_Event e;
     bool quit = false;
     while (!quit){
-        // SDL_Delay(250);
         execute_cpu_cycle(&chip8, &gfx);
         while (SDL_PollEvent(&e)){
             if (e.type == SDL_QUIT){

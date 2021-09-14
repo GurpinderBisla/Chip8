@@ -2,7 +2,6 @@
  * Handles all operations related to graphics and creating a window
  */
 
-#include <SDL2/SDL_render.h>
 #include <stdio.h>
 #include <string.h>
 #include "display.h"

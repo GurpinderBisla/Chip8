@@ -4,7 +4,7 @@
 
 #ifndef CHIP8_DISPLAY_H
 #define CHIP8_DISPLAY_H
-#include "SDL2/SDL.h"
+#include "SDL.h"
 #include <sys/types.h>
 #include <stdbool.h>
 #include <stdint.h>
